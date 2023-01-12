@@ -1,9 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
+import api from "./services/api/config"
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0) as any
+
+  const params = { q:"Marabá"}
+
+  useEffect(() =>{
+    api.get("",{ params })
+    .then((response) => setCount(response.data.name))
+    .catch((err) => console.log(err));
+  },[])
 
   return (
     <div className="App">
@@ -17,7 +26,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() => setCount((count : any) => count + 1)}>
           count is {count}
         </button>
         <p className='font-sans hover:font-serif'>
