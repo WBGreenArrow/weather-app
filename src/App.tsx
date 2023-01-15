@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-import api from "./services/api/config";
-import { Card } from "./components/Card";
+import api from './services/api/config';
+import { Card } from './components/Card';
 
 function App() {
-  const [count, setCount] = useState(0) as any;
+  const [count, setCount] = useState<any>(0);
 
-  const params = { q: "Marabá" };
+  const params = { q: 'Marabá ' };
 
   useEffect(() => {
     api
-      .get("", { params })
+      .get('', { params })
       .then((response) => setCount(response.data.name))
       .catch((err) => console.log(err));
   }, []);
