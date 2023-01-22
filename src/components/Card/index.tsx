@@ -54,16 +54,28 @@ interface IWeatherResponse {
 
 
 export const Card = () => {
-  const [weatherData, setWeatherData] = useState<IWeatherResponse>();
+  const [weatherData, setWeatherData] = useState<IWeatherResponse>()
+  const [inputValue, setInputValue] = useState('')
 
-  const params = { q: 'Marabá' };
+  const currentLocation = 'Marabá'
 
   useEffect(() => {
-    api
-      .get('', { params })
-      .then(({data}) => setWeatherData(data))
-      .catch((err) => console.log(err));
-  }, []);
+    getLocation(currentLocation)
+  }, [])
+
+  const getLocation = async (location: string) =>{
+    const params = { q: location }
+
+    try{
+      const response = await api.get('', { params })
+
+      setWeatherData(response.data)
+      handleCleanInput()
+
+    }catch(err){
+      console.log(err)
+    }
+  }
 
 
   const getCurrentDate = () =>{
@@ -72,10 +84,25 @@ export const Card = () => {
     return date.toLocaleDateString()
   }
   
-  const getCurrentTemp = () =>{
-    const temp = weatherData?.main.temp
+  const getCurrentTemp = (value: any) =>{
+    const temp = value 
 
     return Math.round(temp || 0)
+  }
+
+  const handleInput =(event: React.ChangeEvent<HTMLInputElement>)=>{
+    setInputValue(event.target.value)
+  }
+
+  const handleCleanInput =() =>{
+    setInputValue('')
+  }
+
+  const handleSubmit =() =>{
+    if(inputValue !== ''){
+      const location = inputValue
+      getLocation(location)
+    }
   }
 
   return (
@@ -88,8 +115,16 @@ export const Card = () => {
           <input 
             className="flex-1 bg-transparent outline-none placeholder:text-white text-white text-[15px]
             font-light pl-6 h-full" 
-            type="text" placeholder="Search by city or coutry" />
-          <button className="bg-[#1ab8ed] hover:bg-[#15abdd] w-20 h-12 rounded-full flex justify-center items-center">?</button>
+            type="text" 
+            value={inputValue}
+            placeholder="Search by city or coutry"
+            onChange={(event) => handleInput(event)}
+            />
+          <button 
+          className="bg-[#1ab8ed] hover:bg-[#15abdd] w-20 h-12 rounded-full flex justify-center items-center"
+          onClick={handleSubmit}>
+            ?
+          </button>
         </div>
       </div>
       <div className="w-full bg-black/20 min-h-[584px] max-w-[450px]  text-white backdrop-blur-[32px] rounded-[32px] py-12 px-6">
@@ -114,7 +149,7 @@ export const Card = () => {
           <div className="flex justify-center items-center">
             {/* {temp} */}
             <div className="text-[144px] leading-none font-light" >
-              {getCurrentTemp()}
+              {getCurrentTemp(weatherData?.main.temp)}
             </div>
             <div className="text-4x1" >
               {'°C'}
@@ -131,7 +166,7 @@ export const Card = () => {
                 {'icon'}
               </div>
               <div>
-                visibility <span className="ml-2">{weatherData?.visibility && (weatherData?.visibility / 1000)+ 'km'}</span>
+                Visibilidade <span className="ml-2">{weatherData?.visibility && (weatherData?.visibility / 1000)+ 'km'}</span>
               </div>
             </div>
             <div className="flex items-center gap-x-2">
@@ -139,8 +174,8 @@ export const Card = () => {
                 {'icon'}
               </div>
               <div>
-                visibility <span className="ml-2">
-                  30
+               Sensação T. <span className="ml-2">
+                {getCurrentTemp(weatherData?.main.feels_like)}
                   {'°C'}
                   </span>
               </div>
@@ -152,17 +187,18 @@ export const Card = () => {
                 {'icon'}
               </div>
               <div>
-                visibility <span className="ml-2">10km</span>
-              </div>
+                Humidade <span className="ml-2">
+                {weatherData?.main?.humidity && weatherData?.main?.humidity + '%'}
+                  </span>
+              </div> 
             </div>
             <div className="flex items-center gap-x-2">
               <div className="text-[20px]">
                 {'icon'}
               </div>
               <div>
-                visibility <span className="ml-2">
-                  30
-                  {'°C'}
+                Vento <span className="ml-2">
+                  {weatherData?.wind.speed} m/s
                   </span>
               </div>
             </div>
